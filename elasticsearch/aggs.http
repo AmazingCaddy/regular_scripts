@@ -1,0 +1,108 @@
+GET /egg-*/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "@scope.module": "file.upload"
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "my_buckets": {
+      "composite": {
+        "size": 1000,
+        "sources": [
+          {
+            "workspaceId": {
+              "terms": {
+                "field": "workspaceId.keyword"
+              }
+            }
+          },
+          {
+            "tenantId": {
+              "terms": {
+                "field": "@padding.tenantId"
+              }
+            }
+          },
+          {
+            "fileUploadResult": {
+              "terms": {
+                "field": "result.keyword"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+
+###
+GET /egg-*/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "@scope.module": "file.upload"
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "workspaceId_count": {
+      "terms": {
+        "field": "workspaceId.keyword"
+      },
+      "aggs": {
+        "tenantId_count": {
+          "terms": {
+            "field": "@padding.tenantId"
+          },
+          "aggs": {
+            "file_upload_result": {
+              "terms": {
+                "field": "result.keyword"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+###
+GET /egg-fluent-context-*/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "scope.module": "workspace"
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "count_level": {
+      "terms": {
+        "field": "message.keyword",
+        "size": 1000
+      }
+    }
+  }
+}
